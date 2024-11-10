@@ -1,0 +1,9 @@
+[submodule "edk2"]
+	path = edk2
+	url = https://github.com/tianocore/edk2.git
+[submodule "edk2-libc"]
+	path = edk2-libc
+	url = https://github.com/tianocore/edk2-libc.git
+[submodule "Visual-TORO-C-LIBRARY-for-UEFI"]
+	path = Visual-TORO-C-LIBRARY-for-UEFI
+	url = https://github.com/KilianKegel/Visual-TORO-C-LIBRARY-for-UEFI

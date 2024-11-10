@@ -1,0 +1,23 @@
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = LibExample102
+  FILE_GUID                      = CDE000FF-841E-43E5-81DA-2893C23E5BF3
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 0.1
+  LIBRARY_CLASS                  = LibExample102
+
+[Sources]
+  main.c
+  player.h
+
+[Packages]
+  StdLib/StdLib.dec
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  LibC
+  LibStdio
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /wd4013 /wd4090 /wd4028 /wd4189

@@ -1,0 +1,23 @@
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = example103
+  FILE_GUID                      = CDE000FF-09AB-408D-BF00-A401803CF015
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 0.1
+  ENTRY_POINT                    = ShellCEntryLib
+
+[Sources]
+  main.c
+
+[Packages]
+  StdLib/StdLib.dec
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  LibC
+  LibStdio
+  LibExample102
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /wd4013 /wd4090 /wd4028 /wd4189
