@@ -8,7 +8,7 @@
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
-!include EDK2-LIBC/AppPkg/AppPkg.dsc
+!include edk2-libc/AppPkg/AppPkg.dsc
 
 [LibraryClasses]
     TimerLib|PcAtChipsetPkg\Library\AcpiTimerLib\DxeAcpiTimerLib.inf
