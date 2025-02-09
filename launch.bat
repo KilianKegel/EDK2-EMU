@@ -11,15 +11,18 @@ set path=%path%;%~dp0\Tools
 rem #######################################################################
 rem ### check/create MYDOWNLOADS ##########################################
 rem #######################################################################
-if defined MYDOWNLOADS (
-    rem echo MYDOWNLOADS exist
-    if not exist %MYDOWNLOADS% mkdir %MYDOWNLOADS%
-) else (
+if defined MYDOWNLOADS goto DEFND
+:NOTDEFND
     echo create MYDOWNLOADS locally
     mkdir MYDOWNLOADS
     echo set MYDOWNLOADS=%~dp0MYDOWNLOADS
     set MYDOWNLOADS=%~dp0MYDOWNLOADS
-)
+    goto DONE1
+:DEFND
+    echo MYDOWNLOADS exist
+    if not exist %MYDOWNLOADS% mkdir %MYDOWNLOADS%
+
+:DONE1
 
 rem #######################################################################
 rem ### get TOOLS #########################################################
