@@ -4,9 +4,9 @@
 # This SMM driver performs SMM initialization, deploy SMM Entry Vector,
 # provides CPU specific services in SMM.
 #
-# Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
-# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -30,8 +30,8 @@
 
 [Sources]
   PiSmmCpuDxeSmm.c
-
-  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.h
+  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuCommon.c
+  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuCommon.h
   UefiCpuPkg/PiSmmCpuDxeSmm/MpService.c
   UefiCpuPkg/PiSmmCpuDxeSmm/SyncTimer.c
   UefiCpuPkg/PiSmmCpuDxeSmm/CpuS3.c
@@ -46,30 +46,27 @@
   UefiCpuPkg/PiSmmCpuDxeSmm/SmmMp.c
   UefiCpuPkg/PiSmmCpuDxeSmm/SmmMpPerf.h
   UefiCpuPkg/PiSmmCpuDxeSmm/SmmMpPerf.c
+  UefiCpuPkg/PiSmmCpuDxeSmm/NonMmramMapDxeSmm.c
 
 [Sources.Ia32]
-  UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/Semaphore.c
   UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/PageTbl.c
   UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmmFuncsArch.c
   UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmmProfileArch.c
   UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmmProfileArch.h
-  UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmmInit.nasm
   UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmiEntry.nasm
   UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmiException.nasm
-  UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/MpFuncs.nasm
   UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/Cet.nasm
+  UefiCpuPkg/PiSmmCpuDxeSmm/Ia32/SmmFuncsArchDxeSmm.c
 
 [Sources.X64]
-  UefiCpuPkg/PiSmmCpuDxeSmm/X64/Semaphore.c
   UefiCpuPkg/PiSmmCpuDxeSmm/X64/PageTbl.c
   UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmmFuncsArch.c
   UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmmProfileArch.c
   UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmmProfileArch.h
-  UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmmInit.nasm
   UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmiEntry.nasm
   UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmiException.nasm
-  UefiCpuPkg/PiSmmCpuDxeSmm/X64/MpFuncs.nasm
   UefiCpuPkg/PiSmmCpuDxeSmm/X64/Cet.nasm
+  UefiCpuPkg/PiSmmCpuDxeSmm/X64/SmmFuncsArchDxeSmm.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -87,7 +84,7 @@
   MtrrLib
   IoLib
   TimerLib
-  SmmServicesTableLib
+  MmServicesTableLib
   MemoryAllocationLib
   DebugAgentLib
   HobLib
@@ -107,7 +104,6 @@
   SmmCpuSyncLib
 
 [Protocols]
-  gEfiSmmAccess2ProtocolGuid               ## CONSUMES
   gEfiSmmConfigurationProtocolGuid         ## PRODUCES
   gEfiSmmCpuProtocolGuid                   ## PRODUCES
   gEfiSmmReadyToLockProtocolGuid           ## NOTIFY
@@ -115,6 +111,8 @@
   gEdkiiSmmMemoryAttributeProtocolGuid     ## PRODUCES
   gEfiMmMpProtocolGuid                     ## PRODUCES
   gEdkiiSmmCpuRendezvousProtocolGuid       ## PRODUCES
+  gEfiMpServiceProtocolGuid                ## CONSUMES
+  gEfiSmmVariableProtocolGuid              ## CONSUMES
 
 [Guids]
   gEfiAcpiVariableGuid                     ## SOMETIMES_CONSUMES ## HOB # it is used for S3 boot.
@@ -122,6 +120,7 @@
   gEfiMemoryAttributesTableGuid            ## CONSUMES ## SystemTable
   gSmmBaseHobGuid                          ## CONSUMES
   gMpInformation2HobGuid                   ## CONSUMES # Assume the HOB must has been created
+  gEfiSmmSmramMemoryGuid
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug                         ## CONSUMES
@@ -136,16 +135,15 @@
   gUefiCpuPkgTokenSpaceGuid.PcdSmmApPerfLogEnable                  ## CONSUMES
 
 [Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2                ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize                   ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize                     ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout                 ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress                    ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugDataAddress               ## SOMETIMES_PRODUCES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable         ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode                      ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmShadowStackSize               ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitOnS3Resume           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
