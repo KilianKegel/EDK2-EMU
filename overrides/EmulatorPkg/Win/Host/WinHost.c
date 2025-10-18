@@ -491,9 +491,9 @@ Returns:
   if (1) {
       int i,j;
       char* pWorkspace = getenv("WORKSPACE");
-      SecPrint("######################################################################################################\n");
-      SecPrint("add \"/debug\" command line switch, to connect to the debugger at the very beginning of POST emulation\n");
-      SecPrint("######################################################################################################\n");
+      SecPrint("#############################################################################\n");
+      SecPrint("add \"/debug\" command line switch, to connect to the debugger at the very\nbeginning of POST emulation\n");
+      SecPrint("#############################################################################\n");
 
       if (NULL == pWorkspace)
           pWorkspace = "";
@@ -512,11 +512,11 @@ Returns:
               if (0 == strncmp("/DEBUG", strCmdLineUPCASE, strlen("/DEBUG"))) {
                   //SecPrint("IF YOU WANT TO DEBUG from the very beginning of the EMULATION:\n\t1. start the TASKMGR\n\t2. connect WinHost.exe to the debugger\n\t3. and press ENTER in this command box\nOR\n");
                   SecPrint("\t1. start your debug engine\n");
-                  SecPrint("\t2. attach to process WinHost.exe in your SystemDebugger (Ctrl+Alt+P in V2022)\n");
-                  SecPrint("\t4. SET A SOFTWARE BREAKPOINT (F9) in %s\\overrides\\EmulatorPkg\\Win\\Host\\WinHost.c line 504\n", pWorkspace);
-                  SecPrint("\t5. and press ENTER in the WinHost command box\n");
-                  SecPrint("\t6. go back to the debug engine and RUN/SINGLE STEP the application\n");
-                  SecPrint("\t7. otherwise press enter to continue...\n");
+                  SecPrint("\t2. attach to process WinHost.exe in your SystemDebugger (Ctrl+Alt+P in\n\t   Visual Studio 2026)\n");
+                  SecPrint("\t3. SET A SOFTWARE BREAKPOINT (F9) in\n\t   %s\\overrides\\EmulatorPkg\\Win\\Host\\WinHost.c line 535\n", pWorkspace);
+                  SecPrint("\t4. and press ENTER in the WinHost command box\n");
+                  SecPrint("\t5. go back to the debug engine and RUN/SINGLE STEP the application\n");
+                  SecPrint("\t6. otherwise press enter to continue...\n");
 
                   getchar();    //wait for keyboard input
                   if (0 == strcmp("/DEBUGBREAK", strCmdLineUPCASE)) {

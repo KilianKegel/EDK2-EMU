@@ -135,7 +135,7 @@ if not exist %~dp0\edk2\CONF\MSFTINTRINX86-64.lib (
 )
 
 rem #######################################################################
-rem ### invoke EWDK_1703 startup script ###################################
+rem ### invoke EWDK_1703 startup script 32Bit #############################
 rem #######################################################################
 
 pushd .
@@ -152,16 +152,18 @@ rem ### setup EDK2 build environment ######################################
 rem #######################################################################
 set EDK_TOOLS_PATH=%~dp0EDK2\BaseTools
 if not exist edk2\Conf mkdir edk2\Conf
-if not exist edk2\Conf\target.txt (
-    echo ACTIVE_PLATFORM       = ShellPkg\ShellPkg.dsc> edk2\Conf\target.txt
-    echo TARGET                = RELEASE>>              edk2\Conf\target.txt
-    echo TARGET_ARCH           = X64>>                  edk2\Conf\target.txt
-    echo TOOL_CHAIN_CONF       = Conf/tools_def.txt>>   edk2\Conf\target.txt
-    echo TOOL_CHAIN_TAG        = VS2015x86>>            edk2\Conf\target.txt
-    echo BUILD_RULE_CONF = Conf/build_rule.txt>>        edk2\Conf\target.txt
-    echo MAX_CONCURRENT_THREAD_NUMBER = 1 ^>^>            edk2\Conf\target.txt
-    echo MAX_CONCURRENT_THREAD_NUMBER = 1 >>            edk2\Conf\target.txt
-)
+
+echo ACTIVE_PLATFORM       = ShellPkg\ShellPkg.dsc> edk2\Conf\target.txt
+echo TARGET                = RELEASE>>              edk2\Conf\target.txt
+echo TARGET_ARCH           = IA32>>                  edk2\Conf\target.txt
+echo TOOL_CHAIN_CONF       = Conf/tools_def.txt>>   edk2\Conf\target.txt
+echo TOOL_CHAIN_TAG        = VS2015x86>>            edk2\Conf\target.txt
+echo BUILD_RULE_CONF = Conf/build_rule.txt>>        edk2\Conf\target.txt
+echo MAX_CONCURRENT_THREAD_NUMBER = 1 ^>^>            edk2\Conf\target.txt
+echo MAX_CONCURRENT_THREAD_NUMBER = 1 >>            edk2\Conf\target.txt
+
+set MYEDK2ARCH=IA32
+
 rem ######################################################################
 rem ### EDK2 PACKAGES_PATH
 rem ######################################################################
@@ -191,6 +193,12 @@ set PYTHON_HOME=%~dp0Tools\python-3.10.11
 set PYTHONPATH=%~dp0Tools\python-3.10.11\Lib;%~dp0Tools\python-3.10.11\;
 set PYTHON_COMMAND=%~dp0Tools\python-3.10.11\python.exe
 
+start cmd /c EDK2Rebuild.bat
+echo Building EDK2 32Bit tools ...
+if exist %TEMP%\EDK2REBUILD del %TEMP%\EDK2REBUILD
+:WAITEDK2REBUILD
+if not exist %TEMP%\EDK2REBUILD goto WAITEDK2REBUILD
+
 pushd EDK2
 set VS2015=1
 
@@ -199,19 +207,21 @@ popd
 
 
 set path=%~dp0;%path%
-echo ##################################################################################
-echo ###                                                                            ###
-echo ### enter "BLDEMU"          to build the original tianocore EDK2EMULATOR       ###
-echo ### enter "BLDAPP"          to build the original tianocore AppPkg and MYAPPS  ###
-echo ### enter "RUNEMU /DEBUG"   to start debugging of EDK2EMULATOR build           ###
-echo ###                                                                            ###
-echo ### enter "rd /s /q build" to clean previous build                             ###
-echo ###                                                                            ###
-echo ##################################################################################
+echo ############################################################################
+echo #
+echo #                               -={ 32Bit }=-
+echo #
+echo # enter "BLDEMU"          to build the original tianocore EDK2EMULATOR
+echo # enter "BLDAPP"          to build the original tianocore AppPkg and MYAPPS
+echo # enter "RUNEMU /DEBUG"   to start debugging of EDK2EMULATOR build
+echo #
+echo # enter "rd /s /q build" to clean previous build
+echo #
+echo ############################################################################
 
 rem #######################################################################
 rem ### start cmd.exe #####################################################
 rem #######################################################################
-if not "%~0" == "lauch32.bat" cmd.exe /k title EDK2-EMULATION and LIBC-APPDEVEL
+if not "%~0" == "lauch32.bat" cmd.exe /k title 32BIT EDK2-EMULATION and LIBC-APPDEVEL
 
 :EOF
